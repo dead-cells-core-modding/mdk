@@ -1,0 +1,42 @@
+﻿<Project>
+  <Import Project="$(MDKBuildUtils)DependenciesResolver.targets"/>
+
+  <ItemGroup>
+    <ModAssembly Include="$(AssemblyName)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Condition="$(NoModCore) != true" Include="$(_DCCM_Core_Host_Root)*.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_MDK_ModAssembly_Pdb Include="@(ModAssembly->'$(OutputPath)/%(Identity).pdb')" />
+    <_MDK_ModAssembly_Dll Include="@(ModAssembly->'$(OutputPath)/%(Identity).dll')" />
+    <OutputFiles Include="@(_MDK_ModAssembly_Pdb->Exists());@(_MDK_ModAssembly_Dll)" />
+  </ItemGroup>
+
+
+  <PropertyGroup>
+    <MDKBuildModInfo>
+      $(MDKBuildModInfo);
+      assemblies=#array;
+      @(ModAssembly->Distinct()->'assemblies.#add=%(Identity).dll;');
+    </MDKBuildModInfo>
+    <MDKBuildModInfo Condition="$(MDKDefaultIsLibrary) != true">
+      $(MDKBuildModInfo);
+      main=$(ModMain);
+    </MDKBuildModInfo>
+  </PropertyGroup>
+
+  <Target Name="ResolveModAssemblies" 
+          BeforeTargets="ResolveAssemblyReferences" 
+          DependsOnTargets="ResolveMods">
+    <PropertyGroup>
+      <AssemblySearchPaths>@(ResolvedMods->'%(ModRoot)');$(AssemblySearchPaths);</AssemblySearchPaths>
+    </PropertyGroup>
+
+    <Error Condition="$(NoModCore) != true and !Exists('$(_DCCM_Core_Host_Root)ModCore.dll')"
+           Text="Unable to reference ModCore"
+           />
+  </Target>
+</Project>
