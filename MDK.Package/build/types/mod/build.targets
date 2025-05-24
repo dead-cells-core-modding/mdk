@@ -6,8 +6,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(NoModCore) != true">
-    <Reference Include="$(_DCCM_Core_Host_Root)*.dll" />
-    <Reference Include="$(_DCCM_MDK_Root)ref/*.dll"/>
+    <Reference Include="$(_DCCM_Core_Host_Root)*.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="$(_DCCM_MDK_Root)ref/*.dll">
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
