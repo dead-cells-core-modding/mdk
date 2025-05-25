@@ -51,8 +51,8 @@
   <!--Output-->
   <Target Name="CopyOutputFiles" AfterTargets="Build">
     <PropertyGroup>
-      <MDKOutputPath Condition="'$(MDKOutputPath)' == ''">$(OutputPath)output/$(ModName)/</MDKOutputPath>
-      
+      <MDKOutputPath Condition="'$(MDKOutputPath)' == ''">$(OutputPath)output</MDKOutputPath>
+      <MDKOutputPath>$(MDKOutputPath)/$(ModName)/</MDKOutputPath>
     </PropertyGroup>
     <ItemGroup>
       <_MDK_OutFiles Include="@(OutputFiles)" />
