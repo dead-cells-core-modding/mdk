@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/tools/">
+    <Project Path="../tools/BytecodeMapping/BytecodeMapping.csproj" />
+    <Project Path="HaxeDebugInfo/HaxeDebugInfo.csproj" />
+  </Folder>
+  <Project Path="DeadCellsCoreModding.MDK/DeadCellsCoreModding.MDK.csproj" />
+  <Project Path="MDK.Package/MDK.Package.csproj">
+    <BuildDependency Project="DeadCellsCoreModding.MDK/DeadCellsCoreModding.MDK.csproj" />
+    <BuildDependency Project="HaxeDebugInfo/HaxeDebugInfo.csproj" />
+  </Project>
+  <Project Path="ModCore.Tasks/ModCore.Tasks.csproj" />
+</Solution>
