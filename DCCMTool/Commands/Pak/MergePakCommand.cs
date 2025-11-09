@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using CommandLine.Text;
 using GameRes.Core.Pak;
 using System;
 using System.Collections.Generic;
@@ -75,6 +76,14 @@ namespace DCCMTool.Commands.Pak
             public required string Output { get; set; }
             [Option('s', "stamp", HelpText = "See https://n3rdl0rd.github.io/ModDocCE/files/pak/#stamps")]
             public string? Stamp { get; set; }
+
+            [Usage]
+            public static Example[] Examples => [
+                new("Merge multiple PAK files into a single pak file", new Options(){
+                    Inputs = ["res1.pak", "res2.pak", "res3.pak"],
+                    Output = "output.pak"
+                })
+                ];
         }
     }
 }
