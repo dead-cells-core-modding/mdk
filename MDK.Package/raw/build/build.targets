@@ -70,8 +70,9 @@
       <MDKModFiles Include="$(MDKOutputPath)**/*" />
     </ItemGroup>
     <MakeDir Directories="$(MDKModTargetPath)" />
-    <Copy SourceFiles="@(MDKModFiles)" DestinationFolder="$(MDKModTargetPath)%(RecursiveDir)" />
+    <Message Importance="high" Text="Installing mods" />
+    <Copy SourceFiles="@(MDKModFiles)" DestinationFolder="$(MDKModTargetPath)%(RecursiveDir)" UseHardlinksIfPossible="true" />
   </Target>
-
+  
   <Import Condition="$([System.IO.File]::Exists('$(_MDK_ModBuild)')) == true" Project="$(_MDK_ModBuild)" />
 </Project>

@@ -1,5 +1,14 @@
 ﻿<Project>
+  <PropertyGroup>
+    <GenerateSinglePakFile Condition="$(GenerateDiffCDB) == true">true</GenerateSinglePakFile>
+  </PropertyGroup>
+  
   <Import Project="$(MDKBuildUtils)DependenciesResolver.targets"/>
+
+  <Import Project="$(MDKBuildUtils)GenerateSinglePakFile.targets"
+          Condition="$(GenerateSinglePakFile) == true"/>
+  <Import Project="$(MDKBuildUtils)DiffCDBGenerator.targets"
+          Condition="$(GenerateDiffCDB) == true"/>
 
   <ItemGroup>
     <ModAssembly Include="$(AssemblyName)" />

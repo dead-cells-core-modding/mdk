@@ -12,6 +12,8 @@
     <_DCCM_Core_Root>$(_DCCM_Root)core/</_DCCM_Core_Root>
     <_DCCM_Core_Host_Root>$(_DCCM_Core_Root)host/</_DCCM_Core_Host_Root>
     <_DCCM_Task_DLL>$(_DCCM_MDK_Root)ModCore.Tasks.dll</_DCCM_Task_DLL>
+    <_DCCM_Databases_Root>$(_DCCM_MDK_Root)/databases</_DCCM_Databases_Root>
+    <_DCCM_Tools>dotnet "$(_DCCM_MDK_Root)/tools/DCCMTool.dll" </_DCCM_Tools>
     
     <_DCCM_Exec_BS>dotnet "$(_DCCM_BS_DLL)" </_DCCM_Exec_BS>
 

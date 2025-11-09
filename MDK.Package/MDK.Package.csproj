@@ -14,16 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="build\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="*.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    
+    <RawFiles Include="raw/**/*" />
+    <RawFiles Include="Newtonsoft.Json.dll" />
+    <RawFiles Include="*.ps1" />
+
+    <None Include="@(RawFiles)" />
   </ItemGroup>
 
   <Target Name="CopyPackages" AfterTargets="Build">
@@ -31,7 +26,8 @@
     <ItemGroup>
       <PackageFiles Include="..\DeadCellsCoreModding.MDK\bin\$(Configuration)\*.nupkg" />
     </ItemGroup>
-    <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(OutputPath)packages" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RawFiles)" DestinationFiles="@(RawFiles->'$(OutputPath)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
+    <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(OutputPath)packages" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
   </Target>
 
 </Project>
