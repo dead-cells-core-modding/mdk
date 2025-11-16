@@ -16,13 +16,16 @@ namespace DCCMTool.Commands.Pak
             var output = new DirectoryInfo(Arguments.OutputDir);
             output.Create();
 
+            var files = Arguments.Files?.ToArray() ?? [];
+
+
             foreach (var v in Arguments.PakPath)
             {
                 using var stream = File.OpenRead(v);
-                var pak = PakFile.ReadFrom(stream, false);
+                var pak = new PakFile(stream);
 
 
-                void ExtractToDirectory(PakFile.DirectoryEntry dir, DirectoryInfo output)
+                static void ExtractToDirectory(PakFile.DirectoryEntry dir, DirectoryInfo output)
                 {
                     foreach (var v in dir.Entries)
                     {
@@ -42,7 +45,31 @@ namespace DCCMTool.Commands.Pak
                     }
                 }
 
-                ExtractToDirectory(pak.Root, output);
+                if(files.Length == 0)
+                {
+                    ExtractToDirectory(pak.Root, output);
+                }
+                else
+                {
+                    foreach(var f in files)
+                    {
+                        var entry = pak.GetEntry(f);
+                        var dir = output;
+                        var parent = Path.GetDirectoryName(f);
+                        if(!string.IsNullOrEmpty(parent))
+                        {
+                            dir = dir.CreateSubdirectory(parent);
+                        }
+                        if(entry is PakFile.DirectoryEntry de)
+                        {
+                            ExtractToDirectory(de, dir.CreateSubdirectory(de.Name));
+                        }
+                        else if(entry is PakFile.FileEntry fs)
+                        {
+                            File.WriteAllBytes(Path.Combine(dir.FullName, fs.Name), fs.Data.Data.Span);
+                        }
+                    }
+                } 
             }
         }
 
@@ -53,6 +80,8 @@ namespace DCCMTool.Commands.Pak
         {
             [Option('i', "input", HelpText = "The path to the input pak file.", Required = true)]
             public required IEnumerable<string> PakPath { get; set; }
+            [Option('f', "files", HelpText = "The path to the file or directory to be unpacked.Leave blank to unpack all.")]
+            public IEnumerable<string>? Files { get; set; }
             [Option('o', "output", HelpText = "The path to the output directory.", Required = true)]
             public required string OutputDir { get; set; }
 

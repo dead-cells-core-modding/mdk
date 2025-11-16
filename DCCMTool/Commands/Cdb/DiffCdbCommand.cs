@@ -57,7 +57,7 @@ namespace DCCMTool.Commands.Cdb
 
                 foreach(var v in diff)
                 {
-                    var dir = root.GetOrCreateDirectory(v.Sheet.Name);
+                    var dir = root.GetDirectory(v.Sheet.Name, true);
                     var val = (JObject) v.Value.DeepClone();
                     val["__separator_group_Name"] = v.Separator.Name ?? "";
 

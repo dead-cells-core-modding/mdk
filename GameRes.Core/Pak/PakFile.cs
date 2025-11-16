@@ -2,13 +2,17 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace GameRes.Core.Pak
 {
-    public class PakFile
+    public class PakFile : IDisposable
     {
         public abstract class Entry
         {
@@ -17,8 +21,12 @@ namespace GameRes.Core.Pak
         }
         public class DirectoryEntry : Entry
         {
-            public DirectoryEntry GetOrCreateDirectory(string path)
+            public DirectoryEntry? GetDirectory(string path, [DoesNotReturnIf(true)] bool createWhenMissing = false)
             {
+                if(string.IsNullOrEmpty(path))
+                {
+                    return this;
+                }
                 var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
                 DirectoryEntry cur = this;
                 foreach (var v in parts)
@@ -26,6 +34,10 @@ namespace GameRes.Core.Pak
                     var entry = (DirectoryEntry?)cur.Entries.FirstOrDefault(x => x.Name == v);
                     if (entry == null)
                     {
+                        if(!createWhenMissing)
+                        {
+                            return null;
+                        }
                         entry = new DirectoryEntry()
                         {
                             Name = v
@@ -35,6 +47,18 @@ namespace GameRes.Core.Pak
                     cur = entry;
                 }
                 return cur;
+            }
+            
+            public Entry? GetEntry(string name)
+            {
+                var entry = Entries.FirstOrDefault(x => x.Name == name);
+                if(entry != null)
+                {
+                    return entry;
+                }
+                var p = Path.GetDirectoryName(name) ?? "";
+                var dir = GetDirectory(p, false);
+                return dir?.GetEntry(Path.GetFileName(name));
             }
             public override bool IsDirectory => true;
             public List<Entry> Entries { get; set; } = [];
@@ -57,7 +81,22 @@ namespace GameRes.Core.Pak
 
         public DirectoryEntry GetOrCreateDirectory(string path)
         {
-            return Root.GetOrCreateDirectory(path);
+            return Root.GetDirectory(path, true);
+        }
+
+        public Entry? GetEntry(string path)
+        {
+            return Root.GetEntry(path);
+        }
+
+        public FileEntry? GetFile(string path)
+        {
+            return (FileEntry?) Root.GetEntry(path);
+        }
+
+        public DirectoryEntry? GetDirectory(string path)
+        {
+            return Root.GetDirectory(path, false);
         }
 
         public void Write(BinaryWriter writer)
@@ -132,16 +171,46 @@ namespace GameRes.Core.Pak
             }
         }
 
-        public static PakFile ReadFrom(Stream stream, bool delay = true)
+        private Stream? inputStream;
+        private MemoryMappedFile? mappedFile;
+        private bool leaveOpen = false;
+        private UnmanagedMemoryManager? memoryManager;
+
+        public PakFile()
         {
-            using var reader = new BinaryReader(stream, Encoding.UTF8, true);
-            return ReadFrom(reader, delay);
+
         }
-    
-        public static unsafe PakFile ReadFrom(BinaryReader reader, bool delay = true)
+
+        public unsafe PakFile(Stream input, bool leaveOpen = false, bool allowUseMemporyMappedFile = true)
+        {
+            ArgumentNullException.ThrowIfNull(input);
+
+            this.leaveOpen = leaveOpen;
+            inputStream = input;
+
+            Memory<byte> fileMemoryCopy = new();
+            if(allowUseMemporyMappedFile && input is FileStream fs)
+            {
+                mappedFile = MemoryMappedFile.CreateFromFile(fs, null, 0, MemoryMappedFileAccess.Read,
+                    HandleInheritability.None, leaveOpen);
+
+                input = mappedFile.CreateViewStream(fs.Position, fs.Length - fs.Position, MemoryMappedFileAccess.Read);
+            }
+            if(input is MemoryMappedViewStream mmvs)
+            {
+                byte* ptr = null;
+                mmvs.SafeMemoryMappedViewHandle.AcquirePointer(ref ptr);
+                memoryManager = new(ptr + mmvs.Position, (int)(mmvs.Length - mmvs.Position), mmvs);
+                fileMemoryCopy = memoryManager.Memory;
+            }
+
+            using var reader = new BinaryReader(input, Encoding.UTF8, true);
+            ReadFrom(reader, fileMemoryCopy);
+        }
+        private unsafe void ReadFrom(BinaryReader reader, ReadOnlyMemory<byte> fileMemoryCopy)
         {
             var basePos = reader.BaseStream.Position;
-            var pak = new PakFile();
+            var pak = this;
 
             if(!
                 "PAK"u8.SequenceEqual(reader.ReadBytes(3))
@@ -165,14 +234,14 @@ namespace GameRes.Core.Pak
                 var name = new string(reader.ReadChars(nameLen));
                 var kind = reader.ReadByte();
 
-                if(kind == 1)
+                if (kind == 1)
                 {
                     var dir = new DirectoryEntry()
                     {
                         Name = name,
                     };
                     var entriesCount = reader.ReadInt32();
-                    for(int i = 0; i < entriesCount; i++)
+                    for (int i = 0; i < entriesCount; i++)
                     {
                         dir.Entries.Add(ReadEntry());
                     }
@@ -181,7 +250,7 @@ namespace GameRes.Core.Pak
                 else
                 {
                     long pos;
-                    if((kind & 2) == 2)
+                    if ((kind & 2) == 2)
                     {
                         pos = reader.ReadInt64();
                     }
@@ -192,11 +261,14 @@ namespace GameRes.Core.Pak
                     var size = reader.ReadInt32();
                     var checksum = reader.ReadInt32();
 
-                    PakFileData d = PakFileData.CreateFromStream(reader.BaseStream, basePos + headerSize + pos, size);
-
-                    if(!delay)
+                    PakFileData d;
+                    if (fileMemoryCopy.IsEmpty)
                     {
-                        _ = d.Data;
+                        d = PakFileData.CreateFromStream(reader.BaseStream, basePos + headerSize + pos, size);
+                    }
+                    else
+                    {
+                        d = fileMemoryCopy[(int)(headerSize + pos)..(int)(headerSize + pos + size)];
                     }
 
                     return new FileEntry()
@@ -209,9 +281,17 @@ namespace GameRes.Core.Pak
             }
 
             pak.Root = (DirectoryEntry) ReadEntry();
-
-            return pak;
         }
 
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            if (!leaveOpen)
+            {
+                inputStream?.Dispose();
+            }
+            mappedFile?.Dispose();
+            
+        }
     }
 }

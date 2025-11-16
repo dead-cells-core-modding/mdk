@@ -37,7 +37,7 @@ namespace DCCMTool.Commands.Pak
                     var name = Path.GetFileName(file);
                     var rpath = Path.GetRelativePath(input, Path.GetDirectoryName(file)!)
                         .Replace('\\', '/');
-                    var dir = pakDir.GetOrCreateDirectory(rpath);
+                    var dir = pakDir.GetDirectory(rpath, true);
 
                     Debug.Assert(dir.Name == Path.GetFileName(rpath));
 

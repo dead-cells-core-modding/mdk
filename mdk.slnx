@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/deps/">
+    <Project Path="../sources/HashlinkNET.Compiler/HashlinkNET.Compiler.csproj" />
+  </Folder>
   <Folder Name="/tools/">
     <Project Path="../tools/BytecodeMapping/BytecodeMapping.csproj" />
     <Project Path="DCCMTool/DCCMTool.csproj" Id="8dd879e0-8dbe-4c73-b890-4095dd842b65" />
