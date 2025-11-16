@@ -6,7 +6,7 @@
     <PropertyGroup>
       <PackedAssetsPakPath>$(IntermediateOutputPath)/_pack_assets.pak</PackedAssetsPakPath>
     </PropertyGroup>
-    <Exec Command="$(_DCCM_Tools) pack-pak-with-files -o &quot;$(PackedAssetsPakPath)&quot; -i @(PackAssets->' &quot;%(FullPath)=%(RootInPak)/%(RecursiveDir)%(Filename)%(Extension)%&quot; ')"
+    <Exec Command="$(_DCCM_Tools) pack-pak-with-files -o &quot;$(PackedAssetsPakPath)&quot; -i @(PackAssets->' &quot;%(FullPath)=%(RootInPak)/%(RecursiveDir)%(Filename)%(Extension)%&quot; ', ' ')"
           />
 
     <ItemGroup>
@@ -29,7 +29,7 @@
 
     </PropertyGroup>
 
-    <Exec Command="$(_DCCM_Tools) merge-paks -o &quot;$(MergedPakPath)&quot; -i @(PakFile->' &quot;%(FullPath)&quot; ')"
+    <Exec Command="$(_DCCM_Tools) merge-paks -o &quot;$(MergedPakPath)&quot; -i @(PakFile->' &quot;%(FullPath)&quot; ', ' ')"
           />
 
     <ItemGroup>
