@@ -38,9 +38,9 @@ namespace DCCMTool.Commands.Pak
                         }
                         else if (v is PakFile.FileEntry f)
                         {
-                            File.WriteAllBytes(
+                            File.WriteAllBytesAsync(
                                 Path.Combine(output.FullName, v.Name),
-                                f.Data.Data.Span);
+                                f.Data.Data);
                         }
                     }
                 }
@@ -66,7 +66,7 @@ namespace DCCMTool.Commands.Pak
                         }
                         else if(entry is PakFile.FileEntry fs)
                         {
-                            File.WriteAllBytes(Path.Combine(dir.FullName, fs.Name), fs.Data.Data.Span);
+                            File.WriteAllBytesAsync(Path.Combine(dir.FullName, fs.Name), fs.Data.Data);
                         }
                     }
                 } 

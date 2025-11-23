@@ -200,7 +200,7 @@ namespace GameRes.Core.Pak
             {
                 byte* ptr = null;
                 mmvs.SafeMemoryMappedViewHandle.AcquirePointer(ref ptr);
-                memoryManager = new(ptr + mmvs.Position, (int)(mmvs.Length - mmvs.Position), mmvs);
+                memoryManager = new(ptr + mmvs.Position, (int)(mmvs.Length - mmvs.Position), new { pak = this,  mmvs,  input });
                 fileMemoryCopy = memoryManager.Memory;
             }
 

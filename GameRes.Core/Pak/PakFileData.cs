@@ -23,13 +23,16 @@ namespace GameRes.Core.Pak
                     {
                         return cachedData.Value;
                     }
-                    var data = new byte[size];
-                    var oldPos = stream.Position;
-                    stream.Position = offset;
-                    stream.ReadExactly(data);
-                    stream.Position = oldPos;
-                    cachedData = data;
-                    return data;
+                    lock (stream)
+                    {
+                        var data = new byte[size];
+                        var oldPos = stream.Position;
+                        stream.Position = offset;
+                        stream.ReadExactly(data);
+                        stream.Position = oldPos;
+                        cachedData = data;
+                        return data;
+                    }
                 }
             }
         }

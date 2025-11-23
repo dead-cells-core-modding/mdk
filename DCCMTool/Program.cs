@@ -8,7 +8,7 @@ namespace DCCMTool
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Dictionary<Type, Type> commands = [];
             foreach(var v in typeof(Program).Assembly.GetTypes()
@@ -46,7 +46,7 @@ namespace DCCMTool
 
             var command = (ICommandBase) Activator.CreateInstance(commandType)!;
             command.SetArguments(result.Value);
-            command.Execute();
+            await command.ExecuteAsync();
         }
     }
 }

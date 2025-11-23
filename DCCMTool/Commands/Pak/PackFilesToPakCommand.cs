@@ -15,7 +15,6 @@ namespace DCCMTool.Commands.Pak
         public override void Execute()
         {
             PakFile pak = new();
-
             if (!string.IsNullOrEmpty(Arguments.Stamp))
             {
                 pak.Stamp = Encoding.ASCII.GetBytes(Arguments.Stamp).AsMemory()[..64];

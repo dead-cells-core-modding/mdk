@@ -12,7 +12,7 @@ namespace DCCMTool.Commands.Pak
 {
     internal class PackDirToPakCommand : CommandBase<PackDirToPakCommand.Options>
     {
-        public override void Execute()
+        public override async Task ExecuteAsync()
         {
             PakFile pak = new();
 
@@ -51,7 +51,7 @@ namespace DCCMTool.Commands.Pak
                         dir.Entries.Add(fentry);
                     }
                     fentry.Checksum = null;
-                    fentry.Data = File.ReadAllBytes(file);
+                    fentry.Data = await File.ReadAllBytesAsync(file);
                 }
             }
 
