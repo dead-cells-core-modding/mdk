@@ -22,7 +22,7 @@ namespace DCCMTool.Commands
 
         public virtual void Execute()
         {
-
+            throw new NotImplementedException();
         }
 
         public virtual Task ExecuteAsync()

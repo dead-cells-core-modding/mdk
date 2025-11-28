@@ -15,10 +15,10 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(NoModCore) != true">
-    <Reference Include="$(_DCCM_Core_Host_Root)*.dll">
+    <Reference Include="ModCore;ModCore.Common;HaxeProxy;Serilog;HashlinkSharp;Newtonsoft.Json">
       <Private>false</Private>
     </Reference>
-    <Reference Include="$(_DCCM_MDK_Root)ref/*.dll">
+    <Reference Include="GameProxy">
       <Private>false</Private>
     </Reference>
   </ItemGroup>
@@ -31,22 +31,27 @@
 
 
   <PropertyGroup>
-    <MDKBuildModInfo>
-      $(MDKBuildModInfo);
-      assemblies=#array;
-      @(ModAssembly->Distinct()->'assemblies.#add=%(Identity).dll;');
-    </MDKBuildModInfo>
-    <MDKBuildModInfo Condition="$(MDKDefaultIsLibrary) != true">
-      $(MDKBuildModInfo);
-      main=$(ModMain);
-    </MDKBuildModInfo>
+    <MDKBuildModInfoString>
+      $(MDKBuildModInfoString)"""
+      {
+      "assemblies": [
+      @(ModAssembly->Distinct()->'"%(Identity).dll"', ',')
+      ]
+      }
+    </MDKBuildModInfoString>
+    <MDKBuildModInfoString Condition="$(MDKDefaultIsLibrary) != true">
+      $(MDKBuildModInfoString)"""
+      {
+      "main": "$(ModMain)"
+      }
+    </MDKBuildModInfoString>
   </PropertyGroup>
 
   <Target Name="ResolveModAssemblies" 
           BeforeTargets="ResolveAssemblyReferences" 
           DependsOnTargets="ResolveMods">
     <PropertyGroup>
-      <AssemblySearchPaths>@(ResolvedMods->'%(ModRoot)');$(AssemblySearchPaths);</AssemblySearchPaths>
+      <AssemblySearchPaths>@(ResolvedMods->'%(ModRoot)');$(_DCCM_Core_Host_Root);$(_DCCM_MDK_Root)ref;$(AssemblySearchPaths);</AssemblySearchPaths>
     </PropertyGroup>
 
     <Error Condition="$(NoModCore) != true and !Exists('$(_DCCM_Core_Host_Root)ModCore.dll')"

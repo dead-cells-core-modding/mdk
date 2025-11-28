@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <ModsRoot>$(_DCCM_Mods_Root)</ModsRoot>
   </PropertyGroup>
@@ -9,7 +9,14 @@
       <Output TaskParameter="Output" ItemName="ResolvedMods" />
     </ResolveModDependencies>
     <PropertyGroup>
-      <MDKBuildModInfo>$(MDKBuildModInfo);dependencies=#array;@(ResolvedMods->'dependencies.#add=%(Name)');</MDKBuildModInfo>
+      <MDKBuildModInfoString>
+        $(MDKBuildModInfoString)"""
+        {
+        "dependencies": [
+        @(ResolvedMods->'"%(Name)"', ',')
+        ]
+        }
+      </MDKBuildModInfoString>
     </PropertyGroup>
     
   </Target>

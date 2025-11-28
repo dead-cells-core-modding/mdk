@@ -28,6 +28,5 @@
     <NoModCore>false</NoModCore>
   </PropertyGroup>
 
-  <UsingTask TaskName="GenerateModInfo" AssemblyFile="$(_DCCM_Task_DLL)" />
   <UsingTask TaskName="ResolveModDependencies" AssemblyFile="$(_DCCM_Task_DLL)" />
 </Project>

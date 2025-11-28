@@ -31,13 +31,14 @@ namespace DCCMTool
 
             var result = new Parser(settings =>
             {
-                
+                settings.AllowMultiInstance = true;
             }).ParseArguments(args, [.. commands.Keys]);
 
             if (result.Value == null)
             {
                 HelpText ht = HelpText.AutoBuild(result, 300);
                 Console.Error.WriteLine(ht.ToString());
+                Environment.Exit(-1);
                 return;
             }
 

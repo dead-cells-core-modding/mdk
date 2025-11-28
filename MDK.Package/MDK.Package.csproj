@@ -5,7 +5,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
-    <OutputPath>../bin</OutputPath>
+    <BinOutputPath>../bin</BinOutputPath>
     <PublishDir>$(TEMP)</PublishDir>
   </PropertyGroup>
 
@@ -28,6 +28,13 @@
     </ItemGroup>
     <Copy SourceFiles="@(RawFiles)" DestinationFiles="@(RawFiles->'$(OutputPath)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
     <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(OutputPath)packages" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
+
+    <ItemGroup>
+      <OutputFiles Include="$(OutputPath)/**/*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(OutputFiles)" DestinationFiles="@(OutputFiles->'$(BinOutputPath)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" 
+          Retries="1" ContinueOnError="true"  />
   </Target>
 
 </Project>
