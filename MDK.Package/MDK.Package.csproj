@@ -33,8 +33,7 @@
       <OutputFiles Include="$(OutputPath)/**/*" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(OutputFiles)" DestinationFiles="@(OutputFiles->'$(BinOutputPath)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" 
-          Retries="1" ContinueOnError="true"  />
+    <Copy SourceFiles="@(OutputFiles)" DestinationFiles="@(OutputFiles->'$(BinOutputPath)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" Retries="1" ContinueOnError="true" />
   </Target>
 
 </Project>

@@ -27,7 +27,7 @@ namespace GameRes.Core.Pak
                 {
                     return this;
                 }
-                var parts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                var parts = path.Split(['/', '\\'], StringSplitOptions.RemoveEmptyEntries);
                 DirectoryEntry cur = this;
                 foreach (var v in parts)
                 {
