@@ -3,6 +3,7 @@
     <Project Path="../sources/HashlinkNET.Compiler/HashlinkNET.Compiler.csproj" />
   </Folder>
   <Folder Name="/tools/">
+    <Project Path="../sources/HaxeDocs/HaxeDocs.csproj" Id="dc9df1fe-c6db-4d82-b6c7-e8ab94cbbb15" />
     <Project Path="../tools/BytecodeMapping/BytecodeMapping.csproj" />
     <Project Path="DCCMTool/DCCMTool.csproj" Id="8dd879e0-8dbe-4c73-b890-4095dd842b65" />
   </Folder>
