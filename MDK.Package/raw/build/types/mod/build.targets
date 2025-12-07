@@ -53,9 +53,5 @@
     <PropertyGroup>
       <AssemblySearchPaths>@(ResolvedMods->'%(ModRoot)');$(_DCCM_Core_Host_Root);$(_DCCM_MDK_Root)ref;$(AssemblySearchPaths);</AssemblySearchPaths>
     </PropertyGroup>
-
-    <Error Condition="$(NoModCore) != true and !Exists('$(_DCCM_Core_Host_Root)ModCore.dll')"
-           Text="Unable to reference ModCore"
-           />
   </Target>
 </Project>
